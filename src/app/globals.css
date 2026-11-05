@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-bg: #05070E;
+  --color-brand-surface: #0A0E18;
+  --color-brand-gold: #D4AF37;
+  --color-brand-gold-hover: #E0BE4A;
+  --color-brand-text: #E8ECF4;
+  --color-brand-muted: #7A8194;
+  --color-brand-white: #F5F1E8;
+  --color-whatsapp: #25D366;
+  --color-whatsapp-hover: #1FB457;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-playfair), ui-serif, Georgia, serif;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #05070E;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--color-brand-bg);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(120, 90, 40, 0.15), transparent),
+    radial-gradient(ellipse 60% 40% at 50% 110%, rgba(80, 60, 30, 0.10), transparent);
+}
