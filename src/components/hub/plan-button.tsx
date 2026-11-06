@@ -3,7 +3,6 @@
 import { useTransition } from "react";
 import { Loader2 } from "lucide-react";
 import { trackAndRedirectAction } from "@/actions/track-click";
-import { cn } from "@/lib/utils";
 
 type PlanButtonProps = {
   planName: string;
@@ -27,7 +26,6 @@ export function PlanButton({
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-
     startTransition(async () => {
       await trackAndRedirectAction({
         action: formData.get("action"),
@@ -38,42 +36,45 @@ export function PlanButton({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full">
+    <form onSubmit={handleSubmit} className="w-full relative">
+      {/* Selo "Recomendado" apenas para o plano em destaque */}
+      {featured && (
+        <span className="absolute -top-3 right-2 bg-brand-gold text-brand-bg text-[10px] font-bold uppercase tracking-wider px-2 py-0.5">
+          Recomendado
+        </span>
+      )}
+      
       <input type="hidden" name="action" value={actionName} />
       <input type="hidden" name="redirectUrl" value={stripeUrl} />
 
       <button
         type="submit"
         disabled={isPending}
-        aria-busy={isPending}
-        className={cn(
-          "flex w-full items-center justify-between rounded-2xl border p-5 text-left transition-colors duration-200",
-          "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold",
-          "disabled:cursor-not-allowed disabled:opacity-70",
-          featured
-            ? "border-brand-gold/30 bg-brand-gold/5 hover:border-brand-gold/50"
-            : "border-white/5 bg-brand-surface hover:border-white/10"
-        )}
+        className={`
+          group relative flex w-full items-center justify-between py-8 px-2 text-left transition-all duration-300
+          border-b disabled:opacity-50
+          ${featured 
+            ? "border-brand-gold/30 bg-brand-gold/5 hover:border-brand-gold/50" 
+            : "border-white/10 hover:border-brand-gold/50"
+          }
+        `}
       >
-        <span className="flex flex-col gap-1">
-          <span className="text-base font-medium text-brand-text">
+        <div className="flex flex-col gap-2">
+          <span className="font-serif text-2xl text-brand-white group-hover:text-brand-gold transition-colors">
             {planName}
           </span>
-          <span className="text-sm text-brand-muted">{planDesc}</span>
-        </span>
+          <span className="text-sm text-brand-muted font-light">
+            {planDesc}
+          </span>
+        </div>
 
-        <span className="flex items-center gap-3">
-          {/* Fonte aumentada e em negrito para os valores R$ */}
-          <span className="font-serif text-2xl font-bold text-brand-gold">
+        <div className="flex items-center gap-4">
+          <span className="font-serif text-2xl text-brand-gold">
             {price}
           </span>
-          {isPending && (
-            <Loader2
-              className="h-4 w-4 animate-spin text-brand-gold"
-              aria-hidden="true"
-            />
-          )}
-        </span>
+          {isPending && <Loader2 className="h-4 w-4 animate-spin text-brand-gold" />}
+          <span className="text-brand-muted group-hover:text-brand-gold transition-colors">→</span>
+        </div>
       </button>
     </form>
   );
