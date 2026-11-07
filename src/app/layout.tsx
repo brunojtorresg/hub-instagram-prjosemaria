@@ -25,10 +25,10 @@ export const metadata: Metadata = {
     siteName: "Pr. José Maria Guimarães",
     images: [
       {
-        // Usa o logo como fallback garantido caso a imagem OG não exista no bucket
-        url: process.env.NEXT_PUBLIC_LOGO_URL || "https://svzgtqqutbfjgxwmhbuk.supabase.co/storage/v1/object/public/hub-media/public/og-image.jpg",
-        width: 512,
-        height: 512,
+        // URL da imagem do pastor (substitua pela URL que você copiar do Supabase)
+        url: "https://svzgtqqutbfjgxwmhbuk.supabase.co/storage/v1/object/public/hub-media/public/og-image-pastor.jpg",
+        width: 1200,
+        height: 630,
         alt: "Pr. José Maria Guimarães",
       },
     ],
