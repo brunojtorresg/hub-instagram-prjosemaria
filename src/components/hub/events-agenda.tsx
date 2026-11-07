@@ -29,7 +29,7 @@ function formatDate(isoDate: string): string {
   const date = new Date(`${isoDate}T12:00:00Z`);
   return new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
-    month: "long",
+    month: "short",
     year: "numeric",
     timeZone: "UTC",
   }).format(date);
@@ -44,7 +44,9 @@ export async function EventsAgenda() {
 
   const { data, error } = await supabase
     .from("hub_events")
-    .select("id, title, city, state, country, flag_code, church_name, conference_name, event_date, status, requires_registration, cta_url")
+    .select(
+      "id, title, city, state, country, flag_code, church_name, conference_name, event_date, status, requires_registration, cta_url",
+    )
     .eq("tenant_id", tenantId)
     .eq("is_published", true)
     .gte("event_date", todayIso)
@@ -57,99 +59,118 @@ export async function EventsAgenda() {
   if (events.length === 0) return null;
 
   return (
-    <section className="flex w-full max-w-2xl mx-auto flex-col gap-6 px-6 py-12">
-      <h2 className="text-center text-xs font-medium uppercase tracking-[0.2em] text-brand-muted mb-4">
+    <section className="w-full max-w-2xl mx-auto px-4 py-8">
+      <h2 className="text-center text-xs font-medium uppercase tracking-[0.2em] text-brand-muted mb-8">
         Agenda Global
       </h2>
 
-      {events.map((event) => {
-        const hasValidFlag = FLAG_CODE_PATTERN.test(event.flag_code);
-        const locationParts = [event.city, event.state, event.country].filter(Boolean);
-        const locationString = locationParts.join(" • ");
-        
-        const isSoldOut = event.status === "sold_out";
-        const needsRegistration = event.requires_registration;
-        
-        let buttonHref = "#";
-        let buttonText = "Mais informações";
+      <div className="flex flex-col gap-5">
+        {events.map((event: HubEvent) => {
+          const hasValidFlag = FLAG_CODE_PATTERN.test(event.flag_code);
+          const formattedDate = formatDate(event.event_date);
 
-        if (!isSoldOut) {
-          if (needsRegistration && event.cta_url) {
-            buttonHref = event.cta_url;
-            buttonText = "Garantir presença";
+          const isSoldOut = event.status === "sold_out";
+          const needsRegistration = event.requires_registration;
+
+          let buttonHref = "#";
+          let buttonText = "Mais informações";
+
+          if (!isSoldOut) {
+            if (needsRegistration && event.cta_url) {
+              buttonHref = event.cta_url;
+              buttonText = "Garantir presença";
+            } else {
+              const msg = `Olá! Gostaria de informações sobre o evento "${event.title}" em ${event.city} (${event.country}) no dia ${formattedDate}.`;
+              buttonHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+              buttonText = "Informações via Whatsapp";
+            }
           } else {
-            const msg = `Olá! Gostaria de informações sobre o evento "${event.title}" em ${event.city} (${event.country}) no dia ${formatDate(event.event_date)}.`;
-            buttonHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
-            buttonText = "Falar no WhatsApp";
+            buttonText = "Esgotado";
           }
-        } else {
-          buttonText = "Esgotado";
-        }
 
-        return (
-          <article
-            key={event.id}
-            className="group flex w-full flex-col gap-4 rounded-2xl border border-white/5 bg-brand-surface p-6 transition-all hover:border-brand-gold/30 animate-fade-in-up"
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-center gap-4">
+          return (
+            <article
+              key={event.id}
+              className="group relative flex w-full flex-col gap-4 rounded-xl border border-white/5 bg-brand-surface p-5 transition-all hover:border-brand-gold/20"
+            >
+              {/* Badge de Status - posicionado corretamente dentro do card */}
+              <div className="absolute top-4 right-4">
+                <span
+                  className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide whitespace-nowrap ${
+                    event.status === "open"
+                      ? "border-brand-gold/40 text-brand-gold bg-brand-gold/5"
+                      : event.status === "sold_out"
+                        ? "border-white/10 text-brand-muted bg-white/5"
+                        : "border-brand-gold/30 text-brand-gold/90 bg-brand-gold/5"
+                  }`}
+                >
+                  {STATUS_LABEL[event.status]}
+                </span>
+              </div>
+
+              {/* Header: Bandeira + Localização + Data */}
+              <div className="flex flex-col gap-2 pr-24">
+                {/* Linha 1: Bandeira (Solução definitiva sem warnings) */}
                 {hasValidFlag && (
-                  <Image
-                    src={`https://flagcdn.com/w80/${event.flag_code}.png`}
-                    alt=""
-                    width={40}
-                    height={30}
-                    className="rounded-sm shadow-sm"
-                  />
+                  <div className="flex justify-start">
+                    <div className="relative w-10 h-[30px] shrink-0">
+                      <Image
+                        src={`https://flagcdn.com/w80/${event.flag_code}.png`}
+                        alt={`Bandeira de ${event.country}`}
+                        fill
+                        className="object-contain rounded-sm"
+                      />
+                    </div>
+                  </div>
                 )}
+
+                {/* Linha 2 e 3: Localização e Data */}
                 <div className="flex flex-col">
-                  <span className="text-lg font-medium text-brand-white">
-                    {locationString}
+                  <span className="text-sm font-semibold text-brand-white leading-tight whitespace-nowrap">
+                    {event.city}
+                    {event.state && `, ${event.state}`} • {event.country}
                   </span>
-                  <span className="text-sm text-brand-muted capitalize">
-                    {formatDate(event.event_date)}
+                  <span className="text-xs text-brand-muted mt-0.5 capitalize">
+                    {formattedDate}
                   </span>
                 </div>
               </div>
 
-              <span className={`rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${
-                event.status === 'open' ? 'border-brand-gold/30 text-brand-gold bg-brand-gold/5' :
-                event.status === 'sold_out' ? 'border-white/10 text-brand-muted bg-white/5' :
-                'border-whatsapp/30 text-whatsapp bg-whatsapp/5'
-              }`}>
-                {STATUS_LABEL[event.status]}
-              </span>
-            </div>
+              {/* Divider */}
+              <div className="border-t border-white/5 pt-4">
+                {/* Seção inferior: Igreja + Conferência + Descrição */}
+                <div className="space-y-1.5">
+                  {event.church_name && (
+                    <p className="text-sm font-medium text-brand-white">
+                      {event.church_name}
+                    </p>
+                  )}
+                  {event.conference_name && (
+                    <p className="text-sm italic text-brand-gold">
+                      {event.conference_name}
+                    </p>
+                  )}
+                  <p className="text-sm text-brand-muted leading-relaxed">
+                    {event.title}
+                  </p>
+                </div>
 
-            <div className="space-y-2 pt-2 border-t border-white/5">
-              {event.church_name && (
-                <p className="text-sm font-medium text-brand-white">
-                  {event.church_name}
-                </p>
-              )}
-              {event.conference_name && (
-                <p className="text-sm italic text-brand-gold">
-                  {event.conference_name}
-                </p>
-              )}
-              <p className="text-sm leading-relaxed text-brand-muted">
-                {event.title}
-              </p>
-            </div>
-
-            {!isSoldOut && (
-              <a
-                href={buttonHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-2 block w-full rounded-xl border border-brand-gold/30 bg-brand-gold/5 py-3 text-center text-sm font-semibold text-brand-gold transition-all hover:bg-brand-gold hover:text-brand-bg"
-              >
-                {buttonText}
-              </a>
-            )}
-          </article>
-        );
-      })}
+                {/* Botão */}
+                {!isSoldOut && (
+                  <a
+                    href={buttonHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 block w-full rounded-lg border border-brand-gold/30 bg-brand-gold/5 py-2.5 text-center text-sm font-semibold text-brand-gold transition-all hover:bg-brand-gold hover:text-brand-bg"
+                  >
+                    {buttonText}
+                  </a>
+                )}
+              </div>
+            </article>
+          );
+        })}
+      </div>
     </section>
   );
 }

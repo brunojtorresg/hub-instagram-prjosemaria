@@ -1,0 +1,61 @@
+-- Evento 1: Manaus (13 a 22 de Novembro)
+INSERT INTO public.hub_events (
+  tenant_id, 
+  title, 
+  city, 
+  state, 
+  country, 
+  flag_code, 
+  church_name, 
+  conference_name, 
+  event_date, 
+  status, 
+  requires_registration, 
+  cta_url, 
+  is_published
+) VALUES (
+  'pr-jose-maria-hub',
+  'Seminário de Família',
+  'Manaus',
+  'AM',
+  'Brasil',
+  'br',
+  'Assembleia de Deus',
+  'Seminário de Família (13 a 22 de Novembro)',
+  '2026-11-13', -- Data de início
+  'open',
+  true,
+  NULL, -- Substitua por um link de inscrição se houver
+  true
+);
+
+-- Evento 2: Gravataí (28 e 29 de Novembro)
+INSERT INTO public.hub_events (
+  tenant_id, 
+  title, 
+  city, 
+  state, 
+  country, 
+  flag_code, 
+  church_name, 
+  conference_name, 
+  event_date, 
+  status, 
+  requires_registration, 
+  cta_url, 
+  is_published
+) VALUES (
+  'pr-jose-maria-hub',
+  'Retiro de Homens',
+  'Gravataí',
+  'RS',
+  'Brasil',
+  'br',
+  NULL, -- Pode ser atualizado depois com o nome da igreja local
+  'Retiro de Homens (28 e 29 de Novembro)',
+  '2026-11-28', -- Data de início
+  'open',
+  true,
+  NULL, -- Substitua por um link de inscrição se houver
+  true
+);

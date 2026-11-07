@@ -84,7 +84,7 @@ export default function Home() {
           © {new Date().getFullYear()} Pr. José Maria Guimarães
         </p>
         <p className="text-[10px] text-brand-muted/40 mt-2">
-          Tecnologia & Gestão: Fortis
+          Tecnologia & Gestão: Fortis Gestão | Software e Automação
         </p>
       </footer>
     </main>
