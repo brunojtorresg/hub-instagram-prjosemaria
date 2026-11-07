@@ -113,7 +113,7 @@ export async function EventsAgenda() {
                 {/* Linha 1: Bandeira (Solução definitiva sem warnings) */}
                 {hasValidFlag && (
                   <div className="flex justify-start">
-                    <div className="relative w-10 h-[30px] shrink-0">
+                    <div className="relative w-10 h-8 shrink-0">
                       <Image
                         src={`https://flagcdn.com/w80/${event.flag_code}.png`}
                         alt={`Bandeira de ${event.country}`}
